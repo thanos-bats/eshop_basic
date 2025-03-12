@@ -1,6 +1,8 @@
 import mysql.connector
 import os
 from dotenv import load_dotenv
+from flask import Flask
+from models import db
 
 load_dotenv()
 
@@ -21,12 +23,25 @@ def create_database():
     cursor.close()
     conn.close()
 
+def create_app():
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
+
+    return app
+
+def create_tables():
+    app = create_app()
+    with app.app_context():
+        db.create_all()
+        print(f"Tables created successfully!")
 
 if __name__ == "__main__":
     try:
         create_database()
         print("Database created successfully!")
-        
+        create_tables()
         
     except Exception as e:
         print(f"An error occurred: {str(e)}") 

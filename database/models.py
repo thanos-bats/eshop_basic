@@ -22,7 +22,7 @@ purchase_products = db.Table(
     db.Column('purchase_id', db.Integer, db.ForeignKey('purchases.id'), primary_key=True),
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True),
     db.Column('quantity', db.Integer, nullable=False),
-    db.Column('price', db.Float, nullable=False),
+    db.Column('price', db.DECIMAL(10,2), nullable=False),
     db.Column('created_at', db.DateTime, default=datetime.now)
 )
 
@@ -30,7 +30,7 @@ class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False, index=True)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.DECIMAL(10,2), nullable=False)
     stock = db.Column(db.Integer, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
 

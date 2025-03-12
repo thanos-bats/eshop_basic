@@ -14,7 +14,7 @@ class User(db.Model):
     purchases = db.relationship('Purchase', backref='user', lazy=True)
 
     __table_args__ = (
-        db.Index('idx_username_is_admin', 'username', 'is_admin')
+        db.Index('idx_username_is_admin', 'username', 'is_admin'),
     )
 
 purchase_products = db.Table(
@@ -35,7 +35,7 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     __table_args__ = (
-        db.Index('idx_name_stock', 'name', 'stock')
+        db.Index('idx_name_stock', 'name', 'stock'),
     )
 
 class Purchase(db.Model):
@@ -48,5 +48,5 @@ class Purchase(db.Model):
     products = db.relationship('Product', secondary='purchase_products', backref=db.backref('purchases', lazy=True), lazy=True)
 
     __table_args__ = (
-        db.Index('idx_user_product', 'user_id', 'product_id')
+        db.Index('idx_user_created', 'user_id', 'created_at'),
     )

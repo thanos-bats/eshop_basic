@@ -6,7 +6,7 @@ import os
 from database.models import db
 from routes.user_routes import user_bp
 from routes.products_routes import products_bp
-
+from routes.purchase_routes import purchase_bp
 load_dotenv()
 
 app = Flask(__name__)
@@ -20,6 +20,7 @@ jwt = JWTManager(app)
 
 app.register_blueprint(user_bp)
 app.register_blueprint(products_bp)
+app.register_blueprint(purchase_bp)
 
 if __name__ == "__main__":
     app.run(debug=True, port=4567)

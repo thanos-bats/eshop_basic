@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from services.purchase_serices import create_purchase
+from services.purchase_serices import create_purchase, get_purchases
 
 purchase_bp = Blueprint('purchase_bp', __name__)
 
@@ -11,9 +11,20 @@ def create_purchase_route():
         data = request.json
         products_data = data.get('products', [])
 
-        jwt_idenity = get_jwt_identity()
-        response, status_code = create_purchase(jwt_idenity, products_data)
+        jwt_identity = get_jwt_identity()
+        response, status_code = create_purchase(jwt_identity, products_data)
         return jsonify(response), status_code
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+    
+@purchase_bp.route('/purchases', methods=['GET'])
+@jwt_required()
+def get_purchases_route():
+    try:
+        jwt_identity = get_jwt_identity()
+        user_purchases = get_purchases(jwt_identity)
+        print(f"user purchases: {user_purchases}")
+        return jsonify({"user_id:": jwt_identity, "purchases": user_purchases}), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 500
     

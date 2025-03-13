@@ -1,6 +1,7 @@
 from flask_jwt_extended import get_jwt_identity
-from database.models import db, Purchase, Product, purchase_products
+from database.models import db, User, Purchase, Product, purchase_products
 from datetime import datetime
+from sqlalchemy import func
 
 def create_purchase(jwt_identity, products_data):
 
@@ -66,5 +67,25 @@ def get_purchases(jwt_identity):
             "created_at": purchase.created_at,
             "products": products_list
         })
-        
+
     return result
+
+def get_admin_dashboard(jwt_identity):
+    if not is_admin(jwt_identity):
+        return {"id": jwt_identity, "message": "Admin access required"}, 404
+    
+    total_purchases = Purchase.query.count()
+    total_revenue = db.session.query(func.sum(Purchase.total_amount)).scalar()
+    total_stocks = db.session.query(func.sum(Product.stock)).scalar()
+
+    data = {
+        "total_purchases": total_purchases,
+        "total_revenue": round(total_revenue, 2),
+        "total_stocks": total_stocks
+    }
+    return {"data": data}, 200
+
+def is_admin(user_id):
+    user = User.query.get(user_id)
+    print(f"is admin: {user.is_admin}")
+    return user.is_admin

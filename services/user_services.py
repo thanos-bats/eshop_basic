@@ -7,15 +7,16 @@ def register_user(data):
     try:
         username = data['username']
         password = data['password']
+        is_admin = data.get('is_admin', False)
 
         if User.query.filter_by(username=username).first():
-            return {"message": "User already exists!"}, 400
+            return {"message": f"The username {username} already exists!"}, 400
         
         hashed_password = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_password)
+        new_user = User(username=username, password=hashed_password, is_admin=is_admin)
         db.session.add(new_user)
         db.session.commit()
-        return {"message": "User created successfully!"}, 201
+        return {"message": f"User {username} created successfully!"}, 201
     except Exception as e:
         return {"message": str(e)}, 500
     

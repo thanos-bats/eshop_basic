@@ -39,3 +39,33 @@ def create_purchase(jwt_identity, products_data):
     db.session.commit()
 
     return {"message": "Purchase created successfully.", "id": purchase.id}, 201
+
+
+def get_purchases(jwt_identity):
+    purchases = Purchase.query.filter_by(user_id=jwt_identity).all()
+
+    result = []
+    for purchase in purchases:
+        products_list = []
+        for product in purchase.products:
+            purchase_product = db.session.query(purchase_products).filter_by(
+                    purchase_id=purchase.id,
+                    product_id=product.id
+                ).first()
+            
+            if purchase_product:
+                products_list.append({
+                    "id": product.id,
+                    "name": product.name,
+                    "quantity": purchase_product.quantity,
+                    "price": purchase_product.price
+                })
+
+        result.append({
+            "id": purchase.id,
+            "total_amount": purchase.total_amount,
+            "created_at": purchase.created_at,
+            "products": products_list
+        })
+        
+    return result

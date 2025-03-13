@@ -10,7 +10,7 @@ def register_user(data):
         is_admin = data.get('is_admin', False)
 
         if User.query.filter_by(username=username).first():
-            return {"message": f"The username {username} already exists!"}, 400
+            return {"message": f"The username {username} already exists."}, 400
         
         hashed_password = generate_password_hash(password)
         new_user = User(username=username, password=hashed_password, is_admin=is_admin)
@@ -27,9 +27,9 @@ def login_user(data):
 
         user = User.query.filter_by(username=username).first()
         if not user or not check_password_hash(user.password, password):
-            return {"message": "Invalid credentials!"}, 401
+            return {"message": "Invalid password."}, 401
         
-        access_token = create_access_token(identity=username)
+        access_token = create_access_token(identity=str(user.id))
         return {"access_token": access_token}, 200
     except Exception as e:
         return {"message": str(e)}, 500

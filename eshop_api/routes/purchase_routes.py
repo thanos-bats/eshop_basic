@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.purchase_serices import create_purchase, get_purchases, get_admin_dashboard
-from database.models import User
 
 purchase_bp = Blueprint('purchase_bp', __name__)
 

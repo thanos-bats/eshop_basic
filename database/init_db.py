@@ -2,7 +2,12 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 from flask import Flask
-from models import db, Product
+import sys
+try:
+    from models import db, Product
+except ImportError:
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from eshop_api.database.models import db, Product
 
 load_dotenv()
 

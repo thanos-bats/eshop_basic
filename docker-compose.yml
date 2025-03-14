@@ -1,0 +1,60 @@
+services:
+  db:
+    container_name: eshop_mysql
+    image: mysql:8.0.33
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eshop_network
+
+  init-db:
+    container_name: eshop_init_db
+    build: 
+      context: .
+      dockerfile: database/Dockerfile
+    image: eshop_init_db:1.0
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+    networks:
+      - eshop_network
+
+  api:
+    container_name: eshop_api
+    build: 
+      context: ./eshop_api
+      dockerfile: Dockerfile
+    image: eshop_api:1.4
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+    networks:
+      - eshop_network
+
+networks:
+  eshop_network:
+    driver: bridge
+
+volumes:
+  mysql_data: 
